@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+    <form action="" method="get">
+        {{ form.as_p }}
+        <input type="submit" value="Search">
+    </form><br/><br/>
+
+    <br>
+    {% for category in categories %}
+       <div class="btn-group">
+            <a href="{{ category.get_absolute_url }}" class="btn btn-danger">{{ category.name }}</a>
+            <button type="button" class="btn btn-danger dropdown-toggle dropdown-toggle-split" data-bs-toggle="dropdown" aria-expanded="false">
+                <span class="visually-hidden">Toggle Dropdown</span>
+            </button>
+            <ul class="dropdown-menu">
+                {% for sub in category.scategory.all %}
+                <li><a class="dropdown-item" href="{{ category.get_absolute_url }}">{{ sub.name }}</a></li>
+                {% endfor %}
+            </ul>
+        </div>
+    {% endfor %}
+    <br><br>
+    {% for product in products %}
+        <div class="card" style="width: 18rem; display:inline-block;">
+            <img src="{{ product.image.url }}" class="card-img-top">
+            <div class="card-body">
+                <a href="{{ product.get_absolute_url }}" class="card-title">{{ product.name }}</a>
+            </div>
+        </div>
+    {% endfor %}
+{% endblock %}

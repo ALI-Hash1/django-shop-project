@@ -1,0 +1,58 @@
+services:
+  rabbitmq:
+    container_name: rabbitmq
+    image: rabbitmq:latest
+    networks:
+      - main
+    ports:
+      - "5672:5672"
+    restart: always
+
+  postgres:
+    container_name: postgres
+    image: postgres:latest
+    environment:
+      - POSTGRES_DB=mydatabase
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+    networks:
+      - main
+    ports:
+      - "5432:5432"
+    restart: always
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  celery-worker:
+    container_name: celery_worker
+    command: "celery -A shop worker -l INFO"
+    depends_on:
+      - rabbitmq
+      - app
+      - postgres
+    build: .  
+    environment:
+      - C_FORCE_ROOT="true"
+    networks:
+      - main  
+    restart: always  
+    
+    
+  app:
+    container_name: app  
+    build: .  
+    command: sh -c "python manage.py migrate && python manage.py runserver 0.0.0.0:8000"
+    volumes:
+      - .:/code/  
+    depends_on:
+      - rabbitmq
+      - postgres  
+    networks:
+      - main   
+    restart: always 
+
+volumes:
+  postgres_data:
+
+networks:
+  maina:
